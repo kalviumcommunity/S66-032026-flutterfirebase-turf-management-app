@@ -29,4 +29,4 @@ To ensure scalability and maintainability, this project follows a modular direct
 This sprint provided hands-on experience with Flutter's widget tree and Dart's reactive state management. Building the `WelcomeScreen` demonstrated how `StatefulWidget` allows the UI to dynamically respond to user interactions (like toggling the search button). Setting up the modular folder structure right away makes it clear how dividing UI, data models, and business logic will keep the codebase manageable as we add complex scheduling and calendar features in upcoming sprints.
 
 ## Demo
-![App Screenshot]([!(https://res.cloudinary.com/dtepzmcs3/image/upload/v1772447694/Screenshot_20260302_155430_bicz16.jpg)])
+![App Screenshot](https://res.cloudinary.com/dtepzmcs3/image/upload/v1772447694/Screenshot_20260302_155430_bicz16.jpg)

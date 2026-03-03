@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "586302116519",
+    "project_id": "klyro-b9e67",
+    "storage_bucket": "klyro-b9e67.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:586302116519:android:c30e3a84536c0f1f770182",
+        "android_client_info": {
+          "package_name": "com.example.klyro"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "586302116519-p0me0u5uouhc3scsftr9q7j61udpnhh4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCyC5ges0h9fCtCTNcfZlYSkH6KTr4snS4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "586302116519-p0me0u5uouhc3scsftr9q7j61udpnhh4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

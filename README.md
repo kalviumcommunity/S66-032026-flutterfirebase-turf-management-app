@@ -30,3 +30,34 @@ This sprint provided hands-on experience with Flutter's widget tree and Dart's r
 
 ## Demo
 ![App Screenshot](https://res.cloudinary.com/dtepzmcs3/image/upload/v1772447694/Screenshot_20260302_155430_bicz16.jpg)
+## Responsive UI Implementation (Sprint 2)
+This sprint introduces `responsive_home.dart`, demonstrating adaptive cross-device interfaces. 
+We handled varying screen sizes by using `LayoutBuilder` and `MediaQuery` to toggle between a single-column scrolling layout for smartphones, and a two-column structural grid for tablets and desktops.
+
+### Demonstration
+#### Mobile Layout vs Tablet Layout
+![Mobile vs Tablet App Screenshot](https://res.cloudinary.com/dtepzmcs3/image/upload/v1772447694/Screenshot_20260302_155430_bicz16.jpg)
+*(Note: A single screenshot is used here as a placeholder for both orientations)*
+
+### Key Implementation Details
+We capture the screen width dynamically:
+```dart
+final double screenWidth = MediaQuery.of(context).size.width;
+final bool isTablet = screenWidth > 600;
+```
+
+And structure the tree based on constraints:
+```dart
+child: LayoutBuilder(
+  builder: (context, constraints) {
+    if (isTablet) {
+      return _buildTabletLayout(context, constraints);
+    } else {
+      return _buildMobileLayout(context, constraints);
+    }
+  },
+),
+```
+
+### Reflection
+Building this layout underscored the importance of not just scaling widgets infinitely, but fundamentally rethinking screen real-estate. The challenge was ensuring that elements like `GridView` cross-axis counts and typography scaling felt natural rather than merely "stretched." Responsive design is critical because users expect apps to feel natively optimized for the specific hardware they are holding, rather than dealing with cropped text or comically massive buttons.

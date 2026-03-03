@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'dashboard_screen.dart';
 import 'venue_listing_screen.dart';
+import 'responsive_home.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -16,7 +17,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final List<Widget> _screens = [
     const VenueListingScreen(), // Book (Left)
     const DashboardScreen(), // Home (Center)
-    const Center(child: Text("More Screen")), // More (Right)
+    const ResponsiveHomeScreen(), // More (Right)
   ];
 
   @override

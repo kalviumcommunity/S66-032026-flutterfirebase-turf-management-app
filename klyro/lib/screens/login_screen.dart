@@ -32,14 +32,17 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = true;
     });
     try {
+      debugPrint('🔑 Login attempt for: ${_emailController.text.trim()}');
       await _authService.login(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
+      debugPrint('✅ Login successful');
       if (mounted) {
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
     } catch (error) {
+      debugPrint('❌ Login failed: $error');
       if (!mounted) {
         return;
       }
@@ -62,11 +65,14 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = true;
     });
     try {
+      debugPrint('🔑 Google Sign-In attempt');
       await _authService.signInWithGoogle();
+      debugPrint('✅ Google Sign-In successful');
       if (mounted) {
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
     } catch (error) {
+      debugPrint('❌ Google Sign-In failed: $error');
       if (!mounted) {
         return;
       }

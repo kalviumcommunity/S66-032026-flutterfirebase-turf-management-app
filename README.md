@@ -42,6 +42,11 @@ klyro/
 ├── ios/                   # iOS platform config
 ├── web/                   # Web platform files
 ├── test/                  # Automated tests
+├── nginx/                 # 🐳 Nginx config for Docker
+│   └── nginx.conf         # SPA routing & caching
+├── Dockerfile             # 🐳 Multi-stage Docker build
+├── docker-compose.yml     # 🐳 Docker Compose orchestration
+├── .dockerignore          # 🐳 Docker build context filter
 ├── pubspec.yaml           # Dependencies & configuration
 └── README.md              # This file
 ```
@@ -87,6 +92,51 @@ klyro/
    flutter run -d chrome        # Web
    flutter run -d emulator-5554 # Android emulator
    ```
+
+### 🐳 Running with Docker
+
+You can also build and serve the web version of klyro using Docker — no Flutter SDK required on the host machine.
+
+**Prerequisites:**
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running
+
+#### Option 1: Docker Compose (Recommended)
+```bash
+cd klyro
+docker compose up --build
+```
+This builds the Flutter web app inside a container and serves it at **http://localhost:8080**.
+
+#### Option 2: Manual Docker Build
+```bash
+cd klyro
+
+# Build the image
+docker build -t klyro-web .
+
+# Run the container
+docker run -d -p 8080:80 --name klyro-app klyro-web
+```
+Visit **http://localhost:8080** to access the app.
+
+#### How It Works
+The Dockerfile uses a **multi-stage build**:
+1. **Build stage** — Uses the official Flutter SDK image to compile the web app (`flutter build web --release`)
+2. **Serve stage** — Copies the compiled output into a lightweight **Nginx Alpine** container that serves it on port 80
+
+This keeps the final image small (~25 MB) since it only contains the compiled static files and Nginx.
+
+#### Useful Docker Commands
+```bash
+# Stop the running container
+docker compose down
+
+# Rebuild after code changes
+docker compose up --build
+
+# View container logs
+docker compose logs -f
+```
 
 ### Firebase Configuration
 The app uses Firebase for authentication and data management.
@@ -268,6 +318,116 @@ if (isTablet) {
 
 ---
 
+## 🔥 Hot Reload, Debug Console & DevTools
+
+This section documents our workflow using Flutter's three most powerful development tools.
+
+### 1. Hot Reload — Instant UI Updates
+
+Hot Reload lets you see code changes reflected **instantly** in the running app without losing state.
+
+**How we used it:**
+
+1. Ran the app with `flutter run`
+2. Changed the featured card text in `dashboard_screen.dart`:
+   ```dart
+   // Before
+   Text('Book Venues With The\nBest Offers!');
+
+   // After (Hot Reload change)
+   Text('Find & Book Your\nPerfect Turf!');
+   ```
+3. Saved the file — the text updated instantly on screen without restarting the app
+
+**How to use:**
+- **VS Code**: Press `r` in the terminal or save the file (auto-triggers Hot Reload)
+- **Android Studio**: Click the ⚡ Hot Reload button in the toolbar
+- **Terminal**: Press `r` while `flutter run` is active
+
+---
+
+### 2. Debug Console — Real-Time Logging
+
+The Debug Console shows runtime logs, errors, and custom `debugPrint()` output.
+
+**What we added:**
+
+| File | Log Message | Trigger |
+|------|-------------|---------|
+| `main.dart` | `🚀 TurfBookingApp initialized — Firebase ready` | App startup |
+| `main.dart` | `🔒 User not logged in` / `✅ User logged in` | Auth state change |
+| `login_screen.dart` | `🔑 Login attempt for: email` | Login button tapped |
+| `login_screen.dart` | `✅ Login successful` / `❌ Login failed` | After login result |
+| `main_navigation_screen.dart` | `📱 Navigated to tab: Home` | Tab switched |
+| `dashboard_screen.dart` | `🏟️ Book Now tapped` | Book Now button pressed |
+
+**Example code:**
+```dart
+void _login() async {
+  debugPrint('🔑 Login attempt for: ${_emailController.text.trim()}');
+  try {
+    await _authService.login(email: email, password: password);
+    debugPrint('✅ Login successful');
+  } catch (error) {
+    debugPrint('❌ Login failed: $error');
+  }
+}
+```
+
+> **Tip:** Use `debugPrint()` instead of `print()` for cleaner output with automatic line wrapping.
+
+---
+
+### 3. Flutter DevTools — Debugging & Performance
+
+Flutter DevTools is a browser-based suite for inspecting your app.
+
+**How to launch:**
+```bash
+# Option 1: From terminal
+flutter pub global activate devtools
+flutter pub global run devtools
+
+# Option 2: From VS Code
+# Run app in debug mode → Cmd/Ctrl+Shift+P → "Open DevTools"
+```
+
+**Key features we explored:**
+
+| Tool | Purpose |
+|------|---------|
+| **Widget Inspector** | Visualize the widget tree, inspect layout constraints, and modify properties live |
+| **Performance Tab** | View frame rendering times and identify jank |
+| **Memory Tab** | Analyze memory usage and detect leaks |
+| **Network Tab** | Monitor Firebase API calls and HTTP requests |
+
+---
+
+### 📸 Screenshots
+
+> **Note:** Replace these placeholders with actual screenshots from your demo session.
+
+1. **Hot Reload** — App before and after changing the featured card text
+2. **Debug Console** — Terminal showing `debugPrint()` output during navigation & login
+3. **Flutter DevTools** — Widget Inspector view of the DashboardScreen widget tree
+
+---
+
+### 💭 Reflection
+
+**How does Hot Reload improve productivity?**
+Hot Reload eliminates the compile-wait-restart cycle. Instead of waiting 30–60 seconds to see a UI change, you see it in under a second. This makes design iteration dramatically faster — you can tweak padding, colors, fonts, and layouts in real time. It preserves app state too, so you don't have to navigate back to the screen you're working on.
+
+**Why is DevTools useful for debugging and optimization?**
+DevTools provides visibility that `print()` statements alone cannot. The Widget Inspector shows the actual render tree (not just what you wrote), exposing unexpected nesting, overflow issues, and layout problems. The Performance tab helps you catch janky frames before users notice, and the Memory tab reveals leaks that would otherwise only surface in production.
+
+**How can you use these tools in a team development workflow?**
+- **Hot Reload** lets designers and developers iterate on UI together in real time during review sessions
+- **Debug Console** logs (using `debugPrint`) give teammates a shared understanding of runtime behavior without needing to step through breakpoints
+- **DevTools** screenshots can be attached to PRs to demonstrate performance before/after optimization, making code reviews more informed
+
+---
+
 ## 🔧 Common Development Tasks
 
 ### Adding a New Screen
@@ -386,7 +546,13 @@ flutter run
 
 ## 📝 Version History
 
-### Sprint 2 (Current) — March 5, 2026
+### Dockerization — March 9, 2026
+- ✅ Added multi-stage `Dockerfile` (Flutter build → Nginx serve)
+- ✅ Added `docker-compose.yml` for one-command build & run
+- ✅ Added `nginx/nginx.conf` with SPA routing & gzip compression
+- ✅ Added `.dockerignore` for optimized build context
+
+### Sprint 2 — March 5, 2026
 - ✅ Enhanced project documentation
 - ✅ Created comprehensive PROJECT_STRUCTURE.md
 - ✅ Implemented responsive UI design

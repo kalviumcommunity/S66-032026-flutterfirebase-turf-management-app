@@ -29,24 +29,27 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!(_formKey.currentState?.validate() ?? false)) {
       return;
     }
-    debugPrint('Login attempt with email: ${_emailController.text.trim()}');
+    
     setState(() {
       _isLoading = true;
     });
+
     try {
+      debugPrint('🔑 Login attempt for: ${_emailController.text.trim()}');
       await _authService.login(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
-      debugPrint('Login successful');
+      
+      debugPrint('✅ Login successful');
+      
       if (mounted) {
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
     } catch (error) {
       debugPrint('Login failed: $error');
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(error.toString().replaceFirst('Exception: ', '')),
@@ -62,21 +65,22 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _loginWithGoogle() async {
-    debugPrint('Google login attempt');
     setState(() {
       _isLoading = true;
     });
+
     try {
+      debugPrint('🔑 Google Sign-In attempt');
       await _authService.signInWithGoogle();
-      debugPrint('Google login successful');
+      debugPrint('✅ Google Sign-In successful');
+      
       if (mounted) {
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
     } catch (error) {
-      debugPrint('Google login failed: $error');
-      if (!mounted) {
-        return;
-      }
+      debugPrint('❌ Google Sign-In failed: $error');
+      if (!mounted) return;
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(error.toString().replaceFirst('Exception: ', '')),

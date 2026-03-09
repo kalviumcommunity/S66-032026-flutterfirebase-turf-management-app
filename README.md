@@ -268,6 +268,127 @@ if (isTablet) {
 
 ---
 
+## 🧭 Multi-Screen Navigation
+
+This project uses **named routes** for clean, scalable navigation between screens.
+
+### Route Definitions
+
+All routes are defined in `lib/main.dart` using an `AppRoutes` class:
+
+```dart
+class AppRoutes {
+  static const String home = '/';
+  static const String login = '/login';
+  static const String signup = '/signup';
+  static const String profile = '/profile';
+  static const String venueDetails = '/venue-details';
+  static const String venueListing = '/venue-listing';
+}
+```
+
+Routes are registered in `MaterialApp`:
+```dart
+MaterialApp(
+  home: /* Auth-based StreamBuilder */,
+  routes: {
+    AppRoutes.login: (context) => const LoginScreen(),
+    AppRoutes.signup: (context) => const SignupScreen(),
+    AppRoutes.profile: (context) => const ProfileScreen(),
+    AppRoutes.venueListing: (context) => const VenueListingScreen(),
+  },
+  onGenerateRoute: (settings) {
+    if (settings.name == AppRoutes.venueDetails) {
+      final args = settings.arguments as Map<String, dynamic>?;
+      return MaterialPageRoute(
+        builder: (context) => VenueDetailsScreen(venueData: args),
+      );
+    }
+    return null;
+  },
+);
+```
+
+### Navigation with Named Routes
+
+**Push to a new screen:**
+```dart
+// Navigate to Profile
+Navigator.pushNamed(context, AppRoutes.profile);
+
+// Navigate to Signup
+Navigator.pushNamed(context, AppRoutes.signup);
+```
+
+**Pop back to previous screen:**
+```dart
+Navigator.pop(context);
+```
+
+### Passing Data Between Screens
+
+Venue data is passed from the listing to details via `arguments`:
+
+```dart
+// In venue_listing_screen.dart — sending data
+Navigator.pushNamed(
+  context,
+  AppRoutes.venueDetails,
+  arguments: {
+    'name': 'Trophy Fighters',
+    'image': 'https://...',
+    'rating': 4.5,
+  },
+);
+
+// In venue_details_screen.dart — receiving data
+class VenueDetailsScreen extends StatelessWidget {
+  final Map<String, dynamic>? venueData;
+  const VenueDetailsScreen({super.key, this.venueData});
+
+  @override
+  Widget build(BuildContext context) {
+    final venueName = venueData?['name'] ?? 'Default Venue';
+    // ... use venueName in the UI
+  }
+}
+```
+
+### Navigation Flow
+
+```
+LoginScreen  ──pushNamed──►  SignupScreen
+     │                            │
+     │ (auth success)             │ (auth success)
+     ▼                            ▼
+MainNavigationScreen (tabs: Book | Home | More)
+     │                    │             │
+     │                    │             ▼
+     │                    │      ResponsiveHomeScreen
+     │                    ▼
+     │             DashboardScreen ──pushNamed──► ProfileScreen
+     ▼
+VenueListingScreen ──pushNamed(args)──► VenueDetailsScreen
+```
+
+### 📸 Screenshots
+
+> **Note:** Replace with actual screenshots from your demo session.
+
+1. **Home / Dashboard Screen** — main navigation with three tabs
+2. **Venue Listing** → **Venue Details** — navigation with data passing
+3. **Login** → **Signup** — named route navigation
+
+### 💭 Reflection
+
+**How does Navigator manage the app's stack of screens?**
+Navigator maintains a stack (LIFO) of routes. When you call `pushNamed()`, a new route is pushed on top of the stack. When you call `pop()`, the top route is removed, revealing the previous screen. This stack-based approach gives users a predictable "back" navigation experience.
+
+**What are the benefits of using named routes in larger applications?**
+Named routes centralize routing logic in one place (`main.dart`), making it easy to see all available screens at a glance. They eliminate scattered `MaterialPageRoute` constructors across the codebase, reduce coupling between screens (screens don't need to import each other), and make deep linking straightforward. The `AppRoutes` constants prevent typos and enable IDE auto-completion.
+
+---
+
 ## 🔧 Common Development Tasks
 
 ### Adding a New Screen

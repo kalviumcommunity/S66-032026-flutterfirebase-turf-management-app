@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'firebase_options.dart';
 import 'screens/main_navigation_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/stateless_stateful_demo.dart';
 import 'theme/app_theme.dart';
 
 Future<void> main() async {
@@ -20,20 +21,7 @@ class TurfBookingApp extends StatelessWidget {
     return MaterialApp(
       title: 'Turf Scheduler',
       theme: AppTheme.lightTheme,
-      home: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            );
-          }
-          if (snapshot.data == null) {
-            return const LoginScreen();
-          }
-          return const MainNavigationScreen();
-        },
-      ),
+      home: const StatelessStatefulDemo(),
       debugShowCheckedModeBanner: false,
     );
   }

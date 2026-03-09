@@ -51,9 +51,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: ElevatedButton(
                   onPressed: () async {
                     await _authService.logout();
-                    if (mounted) {
-                      Navigator.of(context).popUntil((route) => route.isFirst);
-                    }
+                    if (!mounted) return;
+                    Navigator.of(this.context).popUntil((route) => route.isFirst);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
@@ -306,15 +305,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   currentPassword: currentController.text,
                   newPassword: newController.text,
                 );
-                if (mounted) {
-                  Navigator.of(dialogContext).pop();
-                  ScaffoldMessenger.of(this.context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Password updated successfully.'),
-                    ),
-                  );
-                }
+                if (!mounted || !dialogContext.mounted) return;
+                Navigator.of(dialogContext).pop();
+                ScaffoldMessenger.of(this.context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Password updated successfully.'),
+                  ),
+                );
               } catch (error) {
+                if (!dialogContext.mounted) return;
                 ScaffoldMessenger.of(dialogContext).showSnackBar(
                   SnackBar(
                     content: Text(
@@ -323,9 +322,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 );
               } finally {
-                setDialogState(() {
-                  isLoading = false;
-                });
+                if (dialogContext.mounted) {
+                  setDialogState(() {
+                    isLoading = false;
+                  });
+                }
               }
             }
 

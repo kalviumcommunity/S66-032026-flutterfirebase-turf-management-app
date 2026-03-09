@@ -65,6 +65,12 @@ klyro/
 ├── test/                             # Automated tests
 │   └── widget_test.dart              # Widget & UI testing example
 │
+├── nginx/                            # 🐳 Nginx configuration for Docker
+│   └── nginx.conf                    # SPA routing, gzip, caching
+├── Dockerfile                        # 🐳 Multi-stage Docker build
+├── docker-compose.yml                # 🐳 Docker Compose orchestration
+├── .dockerignore                     # 🐳 Docker build context filter
+│
 ├── pubspec.yaml                      # Dependency management & configuration
 ├── pubspec.lock                      # Locked dependency versions (auto-generated)
 ├── analysis_options.yaml             # Dart linter rules & analysis settings
@@ -164,6 +170,16 @@ dependencies:
 | `analysis_options.yaml` | Dart linter rules for code quality |
 | `.metadata` | Flutter-generated metadata (do not modify) |
 | `README.md` | Project overview, setup, and reflection |
+
+### 8. **Docker Configuration** — Containerized Web Deployment
+Docker files enable building and serving the Flutter web app in a portable container.
+
+| File | Purpose |
+|------|---------|
+| `Dockerfile` | Multi-stage build: Stage 1 uses Flutter SDK to compile the web app, Stage 2 uses Nginx Alpine to serve it |
+| `docker-compose.yml` | One-command orchestration — `docker compose up --build` builds and runs on port 8080 |
+| `nginx/nginx.conf` | Custom Nginx config with SPA `try_files` fallback, gzip compression, and static asset caching |
+| `.dockerignore` | Excludes platform dirs (`android/`, `ios/`, etc.), build artifacts, and IDE files to keep the build context small |
 
 ---
 
@@ -310,5 +326,5 @@ lib/
 
 ---
 
-**Last Updated:** March 5, 2026  
+**Last Updated:** March 9, 2026  
 **Project:** Community Turf Booking App (klyro)

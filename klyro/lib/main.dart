@@ -9,6 +9,7 @@ import 'theme/app_theme.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  debugPrint('🚀 TurfBookingApp initialized — Firebase ready');
   runApp(const TurfBookingApp());
 }
 
@@ -24,13 +25,16 @@ class TurfBookingApp extends StatelessWidget {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
+            debugPrint('⏳ Checking auth state...');
             return const Scaffold(
               body: Center(child: CircularProgressIndicator()),
             );
           }
           if (snapshot.data == null) {
+            debugPrint('🔒 User not logged in — showing LoginScreen');
             return const LoginScreen();
           }
+          debugPrint('✅ User logged in: ${snapshot.data!.email}');
           return const MainNavigationScreen();
         },
       ),

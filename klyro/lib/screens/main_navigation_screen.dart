@@ -14,6 +14,8 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 1; // Default to Home (center)
 
+  final List<String> _tabNames = ['Book', 'Home', 'More'];
+
   final List<Widget> _screens = [
     const VenueListingScreen(), // Book (Left)
     const DashboardScreen(), // Home (Center)
@@ -73,6 +75,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       onTap: () {
         setState(() {
           _currentIndex = index;
+          debugPrint(
+            '📱 Navigated to tab: ${_tabNames[index]} (index: $index)',
+          );
         });
       },
       behavior: HitTestBehavior.opaque,

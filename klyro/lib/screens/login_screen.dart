@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import 'signup_screen.dart';
@@ -28,24 +29,27 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!(_formKey.currentState?.validate() ?? false)) {
       return;
     }
+    
     setState(() {
       _isLoading = true;
     });
+
     try {
       debugPrint('🔑 Login attempt for: ${_emailController.text.trim()}');
       await _authService.login(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
+      
       debugPrint('✅ Login successful');
+      
       if (mounted) {
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
     } catch (error) {
-      debugPrint('❌ Login failed: $error');
-      if (!mounted) {
-        return;
-      }
+      debugPrint('Login failed: $error');
+      if (!mounted) return;
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(error.toString().replaceFirst('Exception: ', '')),
@@ -64,18 +68,19 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       _isLoading = true;
     });
+
     try {
       debugPrint('🔑 Google Sign-In attempt');
       await _authService.signInWithGoogle();
       debugPrint('✅ Google Sign-In successful');
+      
       if (mounted) {
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
     } catch (error) {
       debugPrint('❌ Google Sign-In failed: $error');
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(error.toString().replaceFirst('Exception: ', '')),

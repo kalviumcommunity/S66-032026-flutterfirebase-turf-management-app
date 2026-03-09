@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import 'signup_screen.dart';
@@ -28,6 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!(_formKey.currentState?.validate() ?? false)) {
       return;
     }
+    debugPrint('Login attempt with email: ${_emailController.text.trim()}');
     setState(() {
       _isLoading = true;
     });
@@ -36,10 +38,12 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
+      debugPrint('Login successful');
       if (mounted) {
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
     } catch (error) {
+      debugPrint('Login failed: $error');
       if (!mounted) {
         return;
       }
@@ -58,15 +62,18 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _loginWithGoogle() async {
+    debugPrint('Google login attempt');
     setState(() {
       _isLoading = true;
     });
     try {
       await _authService.signInWithGoogle();
+      debugPrint('Google login successful');
       if (mounted) {
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
     } catch (error) {
+      debugPrint('Google login failed: $error');
       if (!mounted) {
         return;
       }

@@ -42,6 +42,11 @@ klyro/
 ├── ios/                   # iOS platform config
 ├── web/                   # Web platform files
 ├── test/                  # Automated tests
+├── nginx/                 # 🐳 Nginx config for Docker
+│   └── nginx.conf         # SPA routing & caching
+├── Dockerfile             # 🐳 Multi-stage Docker build
+├── docker-compose.yml     # 🐳 Docker Compose orchestration
+├── .dockerignore          # 🐳 Docker build context filter
 ├── pubspec.yaml           # Dependencies & configuration
 └── README.md              # This file
 ```
@@ -87,6 +92,51 @@ klyro/
    flutter run -d chrome        # Web
    flutter run -d emulator-5554 # Android emulator
    ```
+
+### 🐳 Running with Docker
+
+You can also build and serve the web version of klyro using Docker — no Flutter SDK required on the host machine.
+
+**Prerequisites:**
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running
+
+#### Option 1: Docker Compose (Recommended)
+```bash
+cd klyro
+docker compose up --build
+```
+This builds the Flutter web app inside a container and serves it at **http://localhost:8080**.
+
+#### Option 2: Manual Docker Build
+```bash
+cd klyro
+
+# Build the image
+docker build -t klyro-web .
+
+# Run the container
+docker run -d -p 8080:80 --name klyro-app klyro-web
+```
+Visit **http://localhost:8080** to access the app.
+
+#### How It Works
+The Dockerfile uses a **multi-stage build**:
+1. **Build stage** — Uses the official Flutter SDK image to compile the web app (`flutter build web --release`)
+2. **Serve stage** — Copies the compiled output into a lightweight **Nginx Alpine** container that serves it on port 80
+
+This keeps the final image small (~25 MB) since it only contains the compiled static files and Nginx.
+
+#### Useful Docker Commands
+```bash
+# Stop the running container
+docker compose down
+
+# Rebuild after code changes
+docker compose up --build
+
+# View container logs
+docker compose logs -f
+```
 
 ### Firebase Configuration
 The app uses Firebase for authentication and data management.
@@ -386,7 +436,13 @@ flutter run
 
 ## 📝 Version History
 
-### Sprint 2 (Current) — March 5, 2026
+### Dockerization — March 9, 2026
+- ✅ Added multi-stage `Dockerfile` (Flutter build → Nginx serve)
+- ✅ Added `docker-compose.yml` for one-command build & run
+- ✅ Added `nginx/nginx.conf` with SPA routing & gzip compression
+- ✅ Added `.dockerignore` for optimized build context
+
+### Sprint 2 — March 5, 2026
 - ✅ Enhanced project documentation
 - ✅ Created comprehensive PROJECT_STRUCTURE.md
 - ✅ Implemented responsive UI design

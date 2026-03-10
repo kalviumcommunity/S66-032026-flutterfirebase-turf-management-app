@@ -2,10 +2,21 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
 class VenueDetailsScreen extends StatelessWidget {
-  const VenueDetailsScreen({super.key});
+  final Map<String, dynamic>? venueData;
+
+  const VenueDetailsScreen({super.key, this.venueData});
 
   @override
   Widget build(BuildContext context) {
+    // Extract venue data or use defaults
+    final venueName = venueData?['name'] ?? 'Colosseum Yorkshir';
+    final venueImage =
+        venueData?['image'] ??
+        'https://images.unsplash.com/photo-1518605368461-1ee71168f278?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80';
+    final venueRating = (venueData?['rating'] ?? 4.5).toDouble();
+
+    debugPrint('📍 Viewing venue details: $venueName');
+
     return Scaffold(
       backgroundColor: AppTheme.backgroundLight,
       body: Stack(
@@ -14,7 +25,10 @@ class VenueDetailsScreen extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 100),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [_buildTopSection(context), _buildDetailsSection()],
+              children: [
+                _buildTopSection(context, venueImage),
+                _buildDetailsSection(venueName, venueRating),
+              ],
             ),
           ),
           _buildFloatingBookButton(),
@@ -23,7 +37,7 @@ class VenueDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTopSection(BuildContext context) {
+  Widget _buildTopSection(BuildContext context, String imageUrl) {
     return Container(
       padding: const EdgeInsets.only(top: 50, left: 24, right: 24),
       height: 400,
@@ -67,10 +81,7 @@ class VenueDetailsScreen extends StatelessWidget {
                 ],
               ),
               child: ClipOval(
-                child: Image.network(
-                  'https://images.unsplash.com/photo-1518605368461-1ee71168f278?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
-                  fit: BoxFit.cover,
-                ),
+                child: Image.network(imageUrl, fit: BoxFit.cover),
               ),
             ),
           ),
@@ -79,7 +90,7 @@ class VenueDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailsSection() {
+  Widget _buildDetailsSection(String name, double rating) {
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -100,9 +111,9 @@ class VenueDetailsScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Colosseum Yorkshir',
-                      style: TextStyle(
+                    Text(
+                      name,
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: AppTheme.textDark,
@@ -113,7 +124,7 @@ class VenueDetailsScreen extends StatelessWidget {
                       children: [
                         Row(
                           children: List.generate(
-                            4,
+                            rating.floor(),
                             (index) => const Icon(
                               Icons.star,
                               size: 16,
@@ -121,11 +132,12 @@ class VenueDetailsScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const Icon(
-                          Icons.star_half,
-                          size: 16,
-                          color: Colors.amber,
-                        ),
+                        if (rating - rating.floor() >= 0.5)
+                          const Icon(
+                            Icons.star_half,
+                            size: 16,
+                            color: Colors.amber,
+                          ),
                         const SizedBox(width: 8),
                         const Text(
                           '(54)',

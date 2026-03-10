@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import '../main.dart';
 import '../theme/app_theme.dart';
-import 'venue_details_screen.dart';
 
 class VenueListingScreen extends StatefulWidget {
   const VenueListingScreen({super.key});
@@ -240,11 +240,10 @@ class _VenueListingScreenState extends State<VenueListingScreen> {
         final venue = _venues[index];
         return GestureDetector(
           onTap: () {
-            Navigator.push(
+            Navigator.pushNamed(
               context,
-              MaterialPageRoute(
-                builder: (context) => const VenueDetailsScreen(),
-              ),
+              AppRoutes.venueDetails,
+              arguments: venue,
             );
           },
           child: Container(

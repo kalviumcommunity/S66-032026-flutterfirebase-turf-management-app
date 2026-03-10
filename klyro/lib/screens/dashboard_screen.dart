@@ -229,7 +229,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  'Book Venues With The\nBest Offers!',
+                  'Find & Book Your\nPerfect Turf!',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
@@ -243,7 +243,11 @@ class DashboardScreen extends StatelessWidget {
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      debugPrint(
+                        '🏟️ Book Now tapped — navigating to venue listing',
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.black,

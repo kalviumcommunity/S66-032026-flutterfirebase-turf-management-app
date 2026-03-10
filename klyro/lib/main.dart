@@ -42,13 +42,16 @@ class TurfBookingApp extends StatelessWidget {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
+            debugPrint('⏳ Checking auth state...');
             return const Scaffold(
               body: Center(child: CircularProgressIndicator()),
             );
           }
           if (snapshot.data == null) {
+            debugPrint('🔒 User not logged in — showing LoginScreen');
             return const LoginScreen();
           }
+          debugPrint('✅ User logged in: ${snapshot.data!.email}');
           return const MainNavigationScreen();
         },
       ),

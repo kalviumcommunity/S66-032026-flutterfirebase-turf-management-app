@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'dashboard_screen.dart';
 import 'venue_listing_screen.dart';
-import 'responsive_home.dart';
+import 'responsive_layout.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -19,25 +19,17 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final List<Widget> _screens = [
     const VenueListingScreen(), // Book (Left)
     const DashboardScreen(), // Home (Center)
-    const ResponsiveHomeScreen(), // More (Right)
+    const ResponsiveLayoutScreen(), // More (Right)
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          // The main content
-          IndexedStack(index: _currentIndex, children: _screens),
-
-          // The floating bottom navigation bar
-          Positioned(
-            bottom: 24,
-            left: 24,
-            right: 24,
-            child: _buildFloatingNavBar(),
-          ),
-        ],
+      extendBody: false,
+      body: IndexedStack(index: _currentIndex, children: _screens),
+      bottomNavigationBar: SafeArea(
+        minimum: const EdgeInsets.fromLTRB(24, 12, 24, 20),
+        child: _buildFloatingNavBar(),
       ),
     );
   }

@@ -8,14 +8,17 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.sizeOf(context).width;
+    final bool isTablet = screenWidth >= 700;
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.only(
-            left: 24,
-            right: 24,
+          padding: EdgeInsets.only(
+            left: isTablet ? 32 : 24,
+            right: isTablet ? 32 : 24,
             top: 16,
-            bottom: 120,
+            bottom: 24,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -24,9 +27,9 @@ class DashboardScreen extends StatelessWidget {
               const SizedBox(height: 24),
               _buildSearchBar(),
               const SizedBox(height: 24),
-              _buildFeaturedCard(),
+              _buildFeaturedCard(isTablet: isTablet),
               const SizedBox(height: 24),
-              _buildServicesGrid(),
+              _buildServicesGrid(screenWidth: screenWidth),
             ],
           ),
         ),
@@ -161,10 +164,10 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFeaturedCard() {
+  Widget _buildFeaturedCard({required bool isTablet}) {
     return Container(
       width: double.infinity,
-      height: 280,
+      height: isTablet ? 320 : 280,
       decoration: BoxDecoration(
         color: AppTheme.primaryGreen,
         borderRadius: BorderRadius.circular(24),
@@ -208,8 +211,8 @@ class DashboardScreen extends StatelessWidget {
                 const Spacer(),
                 // Placeholder for soccer ball
                 Container(
-                  width: 80,
-                  height: 80,
+                  width: isTablet ? 92 : 80,
+                  height: isTablet ? 92 : 80,
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     boxShadow: [
@@ -228,12 +231,12 @@ class DashboardScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text(
+                Text(
                   'Find & Book Your\nPerfect Turf!',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 22,
+                    fontSize: isTablet ? 26 : 22,
                     fontWeight: FontWeight.bold,
                     height: 1.2,
                   ),
@@ -278,7 +281,7 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildServicesGrid() {
+  Widget _buildServicesGrid({required double screenWidth}) {
     final List<Map<String, dynamic>> services = [
       {'icon': Icons.calendar_month_outlined, 'title': 'My Calender'},
       {'icon': Icons.edit_document, 'title': 'Create Activity'},
@@ -288,14 +291,26 @@ class DashboardScreen extends StatelessWidget {
       {'icon': Icons.local_offer_outlined, 'title': 'Offers'},
     ];
 
+    final int crossAxisCount = screenWidth >= 1100
+        ? 4
+        : screenWidth >= 700
+        ? 3
+        : 3;
+    final double spacing = screenWidth >= 700 ? 16 : 12;
+    final double horizontalPadding = screenWidth >= 700 ? 64 : 48;
+    final double tileWidth =
+        (screenWidth - horizontalPadding - (spacing * (crossAxisCount - 1))) /
+        crossAxisCount;
+    final double tileHeight = screenWidth >= 700 ? 148 : 126;
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        childAspectRatio: 0.9,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        childAspectRatio: tileWidth / tileHeight,
+        crossAxisSpacing: spacing,
+        mainAxisSpacing: spacing,
       ),
       itemCount: services.length,
       itemBuilder: (context, index) {
@@ -317,14 +332,14 @@ class DashboardScreen extends StatelessWidget {
               Icon(
                 services[index]['icon'],
                 color: AppTheme.darkGreen,
-                size: 28,
+                size: screenWidth >= 700 ? 32 : 28,
               ),
               const SizedBox(height: 12),
               Text(
                 services[index]['title'],
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 12,
+                style: TextStyle(
+                  fontSize: screenWidth >= 700 ? 13 : 12,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.textDark,
                   height: 1.2,

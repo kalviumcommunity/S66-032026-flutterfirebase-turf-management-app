@@ -8,6 +8,9 @@ class VenueDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.sizeOf(context).width;
+    final bool isTablet = screenWidth >= 700;
+
     // Extract venue data or use defaults
     final venueName = venueData?['name'] ?? 'Colosseum Yorkshir';
     final venueImage =
@@ -19,28 +22,34 @@ class VenueDetailsScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundLight,
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            padding: const EdgeInsets.only(bottom: 100),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildTopSection(context, venueImage),
-                _buildDetailsSection(venueName, venueRating),
-              ],
-            ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.only(bottom: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildTopSection(context, venueImage, isTablet: isTablet),
+              _buildDetailsSection(venueName, venueRating, isTablet: isTablet),
+            ],
           ),
-          _buildFloatingBookButton(),
-        ],
+        ),
       ),
+      bottomNavigationBar: _buildBottomBookButton(isTablet: isTablet),
     );
   }
 
-  Widget _buildTopSection(BuildContext context, String imageUrl) {
+  Widget _buildTopSection(
+    BuildContext context,
+    String imageUrl, {
+    required bool isTablet,
+  }) {
     return Container(
-      padding: const EdgeInsets.only(top: 50, left: 24, right: 24),
-      height: 400,
+      padding: EdgeInsets.only(
+        top: isTablet ? 24 : 18,
+        left: isTablet ? 32 : 24,
+        right: isTablet ? 32 : 24,
+      ),
+      height: isTablet ? 460 : 400,
       width: double.infinity,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,8 +73,8 @@ class VenueDetailsScreen extends StatelessWidget {
           const SizedBox(height: 20),
           Center(
             child: Container(
-              width: 250,
-              height: 250,
+              width: isTablet ? 300 : 250,
+              height: isTablet ? 300 : 250,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
@@ -81,7 +90,21 @@ class VenueDetailsScreen extends StatelessWidget {
                 ],
               ),
               child: ClipOval(
-                child: Image.network(imageUrl, fit: BoxFit.cover),
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: AppTheme.backgroundLight,
+                      alignment: Alignment.center,
+                      child: const Icon(
+                        Icons.image_not_supported_outlined,
+                        size: 48,
+                        color: AppTheme.textSecondary,
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           ),
@@ -90,168 +113,178 @@ class VenueDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailsSection(String name, double rating) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(40),
-          topRight: Radius.circular(40),
-        ),
-      ),
-      padding: const EdgeInsets.all(32),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildDetailsSection(
+    String name,
+    double rating, {
+    required bool isTablet,
+  }) {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: isTablet ? 920 : double.infinity),
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(40),
+              topRight: Radius.circular(40),
+            ),
+          ),
+          padding: EdgeInsets.all(isTablet ? 40 : 32),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.textDark,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: List.generate(
-                            rating.floor(),
-                            (index) => const Icon(
-                              Icons.star,
-                              size: 16,
-                              color: Colors.amber,
-                            ),
+                        Text(
+                          name,
+                          style: TextStyle(
+                            fontSize: isTablet ? 28 : 24,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.textDark,
                           ),
                         ),
-                        if (rating - rating.floor() >= 0.5)
-                          const Icon(
-                            Icons.star_half,
-                            size: 16,
-                            color: Colors.amber,
-                          ),
-                        const SizedBox(width: 8),
-                        const Text(
-                          '(54)',
-                          style: TextStyle(
-                            color: AppTheme.textSecondary,
-                            fontSize: 14,
-                          ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Row(
+                              children: List.generate(
+                                rating.floor(),
+                                (index) => const Icon(
+                                  Icons.star,
+                                  size: 16,
+                                  color: Colors.amber,
+                                ),
+                              ),
+                            ),
+                            if (rating - rating.floor() >= 0.5)
+                              const Icon(
+                                Icons.star_half,
+                                size: 16,
+                                color: Colors.amber,
+                              ),
+                            const SizedBox(width: 8),
+                            const Text(
+                              '(54)',
+                              style: TextStyle(
+                                color: AppTheme.textSecondary,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppTheme.backgroundLight,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.favorite_border,
+                          size: 20,
+                          color: AppTheme.textDark,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppTheme.backgroundLight,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.share_outlined,
+                          size: 20,
+                          color: AppTheme.textDark,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
+              const SizedBox(height: 24),
+              _buildInfoRow(Icons.access_time, '06:00 AM - 12 PM'),
+              const SizedBox(height: 16),
+              _buildInfoRow(
+                Icons.location_on_outlined,
+                'Suite / Office XX, 182-184 High Street North,\nEast Ham, London E6 2JA. UK',
+              ),
+              const SizedBox(height: 12),
               Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppTheme.backgroundLight,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.favorite_border,
-                      size: 20,
-                      color: AppTheme.textDark,
-                    ),
+                  const SizedBox(width: 28),
+                  const Icon(
+                    Icons.directions,
+                    size: 16,
+                    color: AppTheme.primaryGreen,
                   ),
-                  const SizedBox(width: 12),
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppTheme.backgroundLight,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.share_outlined,
-                      size: 20,
-                      color: AppTheme.textDark,
+                  const SizedBox(width: 4),
+                  Text(
+                    'Get Direction',
+                    style: TextStyle(
+                      color: AppTheme.primaryGreen,
+                      fontWeight: FontWeight.w600,
+                      decoration: TextDecoration.underline,
                     ),
                   ),
                 ],
               ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          _buildInfoRow(Icons.access_time, '06:00 AM - 12 PM'),
-          const SizedBox(height: 16),
-          _buildInfoRow(
-            Icons.location_on_outlined,
-            'Suite / Office XX, 182-184 High Street North,\nEast Ham, London E6 2JA. UK',
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              const SizedBox(width: 28), // Align with text above
-              const Icon(
-                Icons.directions,
-                size: 16,
-                color: AppTheme.primaryGreen,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                'Get Direction',
+              const SizedBox(height: 32),
+              const Text(
+                'Available Sports',
                 style: TextStyle(
-                  color: AppTheme.primaryGreen,
-                  fontWeight: FontWeight.w600,
-                  decoration: TextDecoration.underline,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textDark,
                 ),
               ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 16,
+                runSpacing: 16,
+                children: [
+                  _buildSportIcon(Icons.sports_tennis),
+                  _buildSportIcon(Icons.sports_soccer),
+                  _buildSportIcon(Icons.sports_basketball),
+                  _buildSportIcon(Icons.sports_cricket),
+                ],
+              ),
+              const SizedBox(height: 32),
+              const Text(
+                'Amenities',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textDark,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 16,
+                runSpacing: 16,
+                children: [
+                  _buildAmenityIcon(Icons.local_parking_outlined),
+                  _buildAmenityIcon(Icons.water_drop_outlined),
+                  _buildAmenityIcon(Icons.people_outline),
+                  _buildAmenityIcon(Icons.timer_outlined),
+                  _buildAmenityIcon(Icons.restaurant_outlined),
+                ],
+              ),
+              const SizedBox(height: 20),
             ],
           ),
-          const SizedBox(height: 32),
-          const Text(
-            'Available Sports',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.textDark,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              _buildSportIcon(Icons.sports_tennis),
-              const SizedBox(width: 16),
-              _buildSportIcon(Icons.sports_soccer),
-              const SizedBox(width: 16),
-              _buildSportIcon(Icons.sports_basketball),
-              const SizedBox(width: 16),
-              _buildSportIcon(Icons.sports_cricket),
-            ],
-          ),
-          const SizedBox(height: 32),
-          const Text(
-            'Amenities',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.textDark,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildAmenityIcon(Icons.local_parking_outlined),
-              _buildAmenityIcon(Icons.water_drop_outlined),
-              _buildAmenityIcon(Icons.people_outline), // 8|8 replacement
-              _buildAmenityIcon(Icons.timer_outlined),
-              _buildAmenityIcon(Icons.restaurant_outlined),
-            ],
-          ),
-          const SizedBox(height: 40),
-        ],
+        ),
       ),
     );
   }
@@ -298,22 +331,16 @@ class VenueDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFloatingBookButton() {
-    return Positioned(
-      bottom: 24,
-      left: 24,
-      right: 24,
-      child: Container(
+  Widget _buildBottomBookButton({required bool isTablet}) {
+    return SafeArea(
+      minimum: EdgeInsets.fromLTRB(
+        isTablet ? 32 : 24,
+        12,
+        isTablet ? 32 : 24,
+        24,
+      ),
+      child: SizedBox(
         height: 60,
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.primaryGreen.withValues(alpha: 0.3),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
         child: ElevatedButton(
           onPressed: () {},
           style: ElevatedButton.styleFrom(

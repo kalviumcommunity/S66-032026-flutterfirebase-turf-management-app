@@ -1,113 +1,146 @@
-# Flutter Environment Setup and First App Run
+# Responsive Layout Design for Klyro
 
-## Steps followed
-1. Installed Flutter SDK and added it to PATH.
-2. Installed Android Studio and required SDK components.
-3. Created and configured an Android emulator.
-4. Verified setup with `flutter doctor`.
-5. Ran the app on the emulator using `flutter run`.
+This task adds a responsive turf management dashboard to the Klyro Flutter app. The screen demonstrates how `Container`, `Row`, and `Column` can be combined with `MediaQuery` and `Expanded` so the interface stacks neatly on phones and shifts into side-by-side panels on tablets or landscape layouts.
+
+## Layout Concept
+
+The design follows the turf booking theme already used in the app. On compact screens, content appears in a vertical flow: hero card, quick stats, schedule, facility details, and action button. On wider screens, the same content reflows into columns so important information remains visible without excessive scrolling.
+
+Main implementation file:
+
+- `lib/screens/responsive_layout.dart`
+
+Navigation integration:
+
+- `lib/screens/main_navigation_screen.dart`
+
+## Core Widgets Used
+
+### Container
+
+`Container` is used for the hero banner, statistic cards, schedule items, and supporting panels.
+
+```dart
+Container(
+  padding: EdgeInsets.all(isWide ? 28 : 20),
+  decoration: BoxDecoration(
+    borderRadius: BorderRadius.circular(28),
+    gradient: const LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [AppTheme.darkGreen, AppTheme.primaryGreen],
+    ),
+  ),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text('Turf Control Center'),
+    ],
+  ),
+)
+```
+
+### Row
+
+`Row` is used for the wide-screen layout so major sections can sit side by side.
+
+```dart
+Row(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    Expanded(flex: 3, child: _buildSchedulePanel(isWide: true)),
+    const SizedBox(width: 24),
+    Expanded(
+      flex: 2,
+      child: Column(
+        children: [
+          Expanded(child: _buildFacilityPanel(isWide: true)),
+          const SizedBox(height: 24),
+          _buildActionBar(isWide: true),
+        ],
+      ),
+    ),
+  ],
+)
+```
+
+### Column
+
+`Column` is used to stack sections vertically for smaller devices and to organize content inside cards.
+
+```dart
+Column(
+  crossAxisAlignment: CrossAxisAlignment.stretch,
+  children: [
+    _buildHeroCard(screenSize, isWide: false),
+    const SizedBox(height: 16),
+    _buildSectionTitle('Quick Stats'),
+    const SizedBox(height: 12),
+    _buildSchedulePanel(isWide: false),
+  ],
+)
+```
+
+## How Responsiveness Was Achieved
+
+- `MediaQuery.sizeOf(context)` reads the screen width.
+- Orientation is checked to support landscape behavior.
+- A boolean breakpoint switches between compact and wide layouts.
+- `Expanded` keeps sections proportional inside `Row` layouts.
+- `SingleChildScrollView` prevents overflow on smaller devices.
+
+Responsive decision snippet:
+
+```dart
+final Size screenSize = MediaQuery.sizeOf(context);
+final Orientation orientation = MediaQuery.orientationOf(context);
+final bool isWide =
+    screenSize.width >= 700 ||
+    (orientation == Orientation.landscape && screenSize.width >= 560);
+```
 
 ## Screenshots
 
-### Flutter Doctor output (all green checks)
-```
-Doctor summary (to see all details, run flutter doctor -v):
-[✓] Flutter (Channel stable, 3.x.x, on Linux, locale en-US)
-[✓] Android toolchain - develop for Android devices
-[✓] Chrome - develop for the web
-[✓] Linux toolchain - develop for Linux desktop
-[✓] Android Studio
-[✓] VS Code (or preferred IDE)
-[✓] Connected device (Android Emulator)
-[✓] Network resources
-• No issues found!
+Add your screenshots here after running the app on two screen sizes or orientations.
+
+### Small Screen / Portrait
+
+Replace with your captured image, for example:
+
+```md
+![Phone Portrait](screenshots/responsive-phone-portrait.png)
 ```
 
-### Running app on emulator
-```
-Launching lib/main.dart on Android SDK built for x86 in debug mode...
-Running Gradle task 'assembleDebug'...
-✓ Built build/app/outputs/flutter-apk/app-debug.apk
-Installing build/app/outputs/flutter-apk/app-debug.apk...
-✓  Installed.
-Syncing files to device Android SDK built for x86...
+### Large Screen / Tablet or Landscape
+
+Replace with your captured image, for example:
+
+```md
+![Tablet Layout](screenshots/responsive-tablet-landscape.png)
 ```
 
 ## Reflection
-The main challenges were configuring PATH correctly and ensuring the Android SDK/emulator matched Flutter's requirements. Running `flutter doctor` helped identify missing components quickly. This setup now allows me to build, run, and test real Flutter apps on an emulator with a reliable toolchain.
 
-# klyro
+### Why is responsiveness important in mobile apps?
 
-A new Flutter project.
+Responsiveness helps the app stay usable and visually balanced across phones, tablets, and rotated screens. It improves readability, prevents overflow issues, and gives users a more polished experience regardless of device size.
 
-## Getting Started
+### What challenges did you face while managing layout proportions?
 
-This project is a starting point for a Flutter application.
+The main challenge was deciding when content should stop stacking vertically and start using horizontal space. The layout needed enough flexibility to avoid cramped rows on medium screens while still reducing scrolling on larger displays.
 
-A few resources to get you started if this is your first Flutter project:
+### How can you improve your layout for different screen orientations?
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+The next improvement would be adding more adaptive breakpoints, scaling typography more precisely, and slightly changing card heights for landscape mode so the content feels better balanced on foldables, tablets, and desktop web widths.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Submission Notes
 
-![alt text](image.png)
-
-# Flutter Hot Reload, Debug Console, and DevTools Demo
-
-## Project Title
-Flutter Development Tools Demo
-
-## Short Explanation
-This section demonstrates the use of Flutter's Hot Reload feature, Debug Console for logging, and Flutter DevTools for debugging and performance analysis in the Turf Scheduler app.
-
-## Steps Performed
-
-### Using Hot Reload
-1. Ran the app using `flutter run` in the terminal.
-2. Modified a UI element (e.g., changed "Welcome Back" to "Welcome to Turf Scheduler" in `login_screen.dart`).
-3. Saved the file, and the app updated instantly without restarting, preserving app state.
-
-### Using Debug Console
-1. Added `debugPrint()` statements in `login_screen.dart`:
-   - In `_login()`: Logs email on attempt, success, or failure.
-   - In `_loginWithGoogle()`: Logs Google login attempts and outcomes.
-2. Ran the app and performed login actions.
-3. Viewed real-time logs in the Debug Console (terminal or VS Code output panel).
-
-### Exploring Flutter DevTools
-1. Activated DevTools: `flutter pub global activate devtools` then `flutter pub global run devtools`.
-2. With the app running, opened DevTools in the browser.
-3. Explored tabs:
-   - **Widget Inspector**: Inspected the widget tree, selected elements, and viewed properties.
-   - **Performance**: Monitored frame rendering times and identified bottlenecks.
-   - **Memory**: Checked memory usage and potential leaks.
-   - **Network**: Observed API calls (e.g., Firebase authentication requests).
-
-## Screenshots
-
-### Running App After Hot Reload Update
-![Hot Reload Update](hot_reload_update.png)
-
-### Debug Console Displaying Logs
-![Debug Console Logs](debug_console_logs.png)
-
-### Flutter DevTools Window (Widget Inspector)
-![DevTools Widget Inspector](devtools_widget_inspector.png)
-
-### Flutter DevTools Performance View
-![DevTools Performance](devtools_performance.png)
-
-## Reflection
-
-### How does Hot Reload improve productivity?
-Hot Reload allows instant application of code changes without restarting the app, preserving state and significantly speeding up UI iteration. This reduces development time by enabling quick testing of visual changes, layouts, and interactions, making the workflow more efficient and iterative.
-
-### Why is DevTools useful for debugging and optimization?
-DevTools provides visual tools for inspecting the widget tree, profiling performance, analyzing memory usage, and monitoring network requests. It helps identify UI issues, performance bottlenecks, and memory leaks early, enabling optimized, bug-free apps through interactive debugging and data-driven insights.
-
-### How can you use these tools in a team development workflow?
-In a team, Hot Reload facilitates rapid prototyping and collaborative UI reviews by allowing instant previews of changes. Debug Console logs aid in shared debugging sessions, while DevTools supports performance audits and code reviews. Teams can integrate these into CI/CD for automated checks, ensuring consistent quality and faster iterations across developers.
+- Commit message:
+  - `feat: designed responsive layout using rows, columns, and containers`
+- Suggested PR title:
+  - `[Sprint-2] Responsive Layout Design – TeamName`
+- PR description should include:
+  - implementation summary
+  - responsive screenshots
+  - short reflection
+  - demo video link

@@ -67,17 +67,20 @@ class _VenueListingScreenState extends State<VenueListingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.sizeOf(context).width;
+    final bool isTablet = screenWidth >= 700;
+
     return Scaffold(
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildAppBar(),
+            _buildAppBar(isTablet: isTablet),
             const SizedBox(height: 20),
-            _buildCategoryList(),
+            _buildCategoryList(isTablet: isTablet),
             const SizedBox(height: 24),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: EdgeInsets.symmetric(horizontal: isTablet ? 32 : 24),
               child: Text(
                 'For ${_categories[_selectedCategoryIndex]['name']} Ground',
                 style: const TextStyle(
@@ -88,16 +91,16 @@ class _VenueListingScreenState extends State<VenueListingScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            Expanded(child: _buildVenueGrid()),
+            Expanded(child: _buildVenueGrid(screenWidth: screenWidth)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildAppBar() {
+  Widget _buildAppBar({required bool isTablet}) {
     return Padding(
-      padding: const EdgeInsets.only(left: 16, right: 24, top: 16),
+      padding: EdgeInsets.only(left: isTablet ? 24 : 16, right: 24, top: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -165,12 +168,12 @@ class _VenueListingScreenState extends State<VenueListingScreen> {
     );
   }
 
-  Widget _buildCategoryList() {
+  Widget _buildCategoryList({required bool isTablet}) {
     return SizedBox(
-      height: 90,
+      height: isTablet ? 104 : 90,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: EdgeInsets.symmetric(horizontal: isTablet ? 24 : 16),
         itemCount: _categories.length,
         itemBuilder: (context, index) {
           final isSelected = index == _selectedCategoryIndex;
@@ -185,8 +188,8 @@ class _VenueListingScreenState extends State<VenueListingScreen> {
               child: Column(
                 children: [
                   Container(
-                    width: 60,
-                    height: 60,
+                    width: isTablet ? 68 : 60,
+                    height: isTablet ? 68 : 60,
                     decoration: BoxDecoration(
                       color: isSelected ? AppTheme.primaryGreen : Colors.white,
                       shape: BoxShape.circle,
@@ -201,14 +204,14 @@ class _VenueListingScreenState extends State<VenueListingScreen> {
                     child: Icon(
                       _categories[index]['icon'],
                       color: isSelected ? Colors.black : AppTheme.textDark,
-                      size: 28,
+                      size: isTablet ? 30 : 28,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     _categories[index]['name'],
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: isTablet ? 13 : 12,
                       fontWeight: isSelected
                           ? FontWeight.bold
                           : FontWeight.w500,
@@ -226,14 +229,33 @@ class _VenueListingScreenState extends State<VenueListingScreen> {
     );
   }
 
-  Widget _buildVenueGrid() {
+  Widget _buildVenueGrid({required double screenWidth}) {
+    final double horizontalPadding = screenWidth >= 700 ? 32 : 24;
+    final int crossAxisCount = screenWidth >= 1200
+        ? 4
+        : screenWidth >= 900
+        ? 3
+        : screenWidth >= 700
+        ? 2
+        : 1;
+    final double gridSpacing = screenWidth >= 700 ? 20 : 16;
+    final double usableWidth = screenWidth - (horizontalPadding * 2);
+    final double cardWidth =
+        (usableWidth - (gridSpacing * (crossAxisCount - 1))) / crossAxisCount;
+    final double imageHeight = screenWidth >= 900 ? 160 : 140;
+    final double cardHeight = imageHeight + (screenWidth >= 700 ? 142 : 132);
+
     return GridView.builder(
-      padding: const EdgeInsets.only(left: 24, right: 24, bottom: 120),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 0.75, // Adjust based on card content height
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
+      padding: EdgeInsets.only(
+        left: horizontalPadding,
+        right: horizontalPadding,
+        bottom: 24,
+      ),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        childAspectRatio: cardWidth / cardHeight,
+        crossAxisSpacing: gridSpacing,
+        mainAxisSpacing: gridSpacing,
       ),
       itemCount: _venues.length,
       itemBuilder: (context, index) {
@@ -267,20 +289,31 @@ class _VenueListingScreenState extends State<VenueListingScreen> {
                   ),
                   child: Image.network(
                     venue['image'],
-                    height: 100,
+                    height: imageHeight,
                     width: double.infinity,
                     fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        height: imageHeight,
+                        color: AppTheme.backgroundLight,
+                        alignment: Alignment.center,
+                        child: const Icon(
+                          Icons.image_not_supported_outlined,
+                          color: AppTheme.textSecondary,
+                        ),
+                      );
+                    },
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(12),
+                  padding: EdgeInsets.all(screenWidth >= 700 ? 16 : 12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         venue['name'],
-                        style: const TextStyle(
-                          fontSize: 14,
+                        style: TextStyle(
+                          fontSize: screenWidth >= 700 ? 16 : 14,
                           fontWeight: FontWeight.bold,
                           color: AppTheme.textDark,
                         ),
@@ -299,8 +332,8 @@ class _VenueListingScreenState extends State<VenueListingScreen> {
                           Expanded(
                             child: Text(
                               venue['location'],
-                              style: const TextStyle(
-                                fontSize: 10,
+                              style: TextStyle(
+                                fontSize: screenWidth >= 700 ? 11 : 10,
                                 color: AppTheme.textSecondary,
                               ),
                               maxLines: 1,
@@ -322,13 +355,12 @@ class _VenueListingScreenState extends State<VenueListingScreen> {
                         }),
                       ),
                       const SizedBox(height: 8),
-                      // Mock Icons for available sports at bottom
-                      Row(
+                      Wrap(
+                        spacing: 4,
+                        runSpacing: 4,
                         children: [
                           _buildMiniIcon(Icons.sports_cricket_outlined),
-                          const SizedBox(width: 4),
                           _buildMiniIcon(Icons.sports_soccer_outlined),
-                          const SizedBox(width: 4),
                           _buildMiniIcon(Icons.sports_tennis_outlined),
                         ],
                       ),

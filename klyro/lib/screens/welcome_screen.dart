@@ -36,24 +36,29 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               color: _isSearching ? Colors.orange : Colors.green,
             ),
             const SizedBox(height: 30),
-            
+
             // Text that changes based on state
             Text(
-              _isSearching 
-                  ? 'Searching for available slots...' 
+              _isSearching
+                  ? 'Searching for available slots...'
                   : 'Let\'s prevent double-bookings!',
               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 40),
-            
+
             // Button triggering the state change
             ElevatedButton.icon(
               onPressed: _toggleSearch,
               icon: Icon(_isSearching ? Icons.cancel : Icons.search),
-              label: Text(_isSearching ? 'Cancel Search' : 'Find Turf Availability'),
+              label: Text(
+                _isSearching ? 'Cancel Search' : 'Find Turf Availability',
+              ),
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
                 textStyle: const TextStyle(fontSize: 18),
               ),
             ),

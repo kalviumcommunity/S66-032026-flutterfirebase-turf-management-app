@@ -27,7 +27,7 @@ class DashboardScreen extends StatelessWidget {
               const SizedBox(height: 24),
               _buildSearchBar(),
               const SizedBox(height: 24),
-              _buildFeaturedCard(isTablet: isTablet),
+              _buildFeaturedCard(context: context, isTablet: isTablet),
               const SizedBox(height: 24),
               _buildServicesGrid(screenWidth: screenWidth),
             ],
@@ -49,14 +49,21 @@ class DashboardScreen extends StatelessWidget {
       children: [
         Row(
           children: [
-            GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, AppRoutes.profile);
-              },
-              child: const CircleAvatar(
-                radius: 20,
-                backgroundImage: NetworkImage(
-                  'https://i.pravatar.cc/150?img=11',
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  Navigator.pushNamed(context, AppRoutes.profile);
+                },
+                customBorder: const CircleBorder(),
+                child: const Padding(
+                  padding: EdgeInsets.all(2),
+                  child: CircleAvatar(
+                    radius: 20,
+                    backgroundImage: NetworkImage(
+                      'https://i.pravatar.cc/150?img=11',
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -164,7 +171,10 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFeaturedCard({required bool isTablet}) {
+  Widget _buildFeaturedCard({
+    required BuildContext context,
+    required bool isTablet,
+  }) {
     return Container(
       width: double.infinity,
       height: isTablet ? 320 : 280,
@@ -247,9 +257,7 @@ class DashboardScreen extends StatelessWidget {
                   height: 50,
                   child: ElevatedButton(
                     onPressed: () {
-                      debugPrint(
-                        '🏟️ Book Now tapped — navigating to venue listing',
-                      );
+                      Navigator.pushNamed(context, AppRoutes.createBooking);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
@@ -314,38 +322,49 @@ class DashboardScreen extends StatelessWidget {
       ),
       itemCount: services.length,
       itemBuilder: (context, index) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
+        return Material(
+          color: Colors.transparent,
+          child: InkWell(
             borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
+            onTap: () {
+              if (index == 1 || index == 2) {
+                Navigator.pushNamed(context, AppRoutes.createBooking);
+              }
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.03),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                services[index]['icon'],
-                color: AppTheme.darkGreen,
-                size: screenWidth >= 700 ? 32 : 28,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    services[index]['icon'],
+                    color: AppTheme.darkGreen,
+                    size: screenWidth >= 700 ? 32 : 28,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    services[index]['title'],
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: screenWidth >= 700 ? 13 : 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.textDark,
+                      height: 1.2,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
-              Text(
-                services[index]['title'],
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: screenWidth >= 700 ? 13 : 12,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.textDark,
-                  height: 1.2,
-                ),
-              ),
-            ],
+            ),
           ),
         );
       },

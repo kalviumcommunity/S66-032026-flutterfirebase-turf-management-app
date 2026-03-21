@@ -52,7 +52,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onPressed: () async {
                     await _authService.logout();
                     if (!mounted) return;
-                    Navigator.of(this.context).popUntil((route) => route.isFirst);
+                    Navigator.of(
+                      this.context,
+                    ).popUntil((route) => route.isFirst);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,

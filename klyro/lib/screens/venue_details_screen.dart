@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../utils/app_logger.dart';
 
 class VenueDetailsScreen extends StatelessWidget {
   final Map<String, dynamic>? venueData;
@@ -18,7 +19,7 @@ class VenueDetailsScreen extends StatelessWidget {
         'https://images.unsplash.com/photo-1518605368461-1ee71168f278?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80';
     final venueRating = (venueData?['rating'] ?? 4.5).toDouble();
 
-    debugPrint('📍 Viewing venue details: $venueName');
+    AppLogger.debug('📍 Viewing venue details: $venueName');
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundLight,
@@ -153,22 +154,7 @@ class VenueDetailsScreen extends StatelessWidget {
                         const SizedBox(height: 8),
                         Row(
                           children: [
-                            Row(
-                              children: List.generate(
-                                rating.floor(),
-                                (index) => const Icon(
-                                  Icons.star,
-                                  size: 16,
-                                  color: Colors.amber,
-                                ),
-                              ),
-                            ),
-                            if (rating - rating.floor() >= 0.5)
-                              const Icon(
-                                Icons.star_half,
-                                size: 16,
-                                color: Colors.amber,
-                              ),
+                            Row(children: _buildRatingIcons(rating)),
                             const SizedBox(width: 8),
                             const Text(
                               '(54)',
@@ -307,6 +293,23 @@ class VenueDetailsScreen extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  List<Widget> _buildRatingIcons(double rating) {
+    return List.generate(5, (starIndex) {
+      final bool isFullStar = starIndex < rating.floor();
+      final bool isHalfStar =
+          !isFullStar && starIndex < rating && rating - rating.floor() >= 0.5;
+      return Icon(
+        isFullStar
+            ? Icons.star
+            : isHalfStar
+            ? Icons.star_half
+            : Icons.star_border,
+        size: 16,
+        color: Colors.amber,
+      );
+    });
   }
 
   Widget _buildSportIcon(IconData icon) {

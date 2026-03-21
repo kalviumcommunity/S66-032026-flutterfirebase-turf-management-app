@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import '../main.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
+import '../utils/app_logger.dart';
+import '../widgets/custom_button.dart';
+import '../widgets/custom_text_field.dart';
+import '../widgets/section_header.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -34,19 +38,19 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      debugPrint('🔑 Login attempt for: ${_emailController.text.trim()}');
+      AppLogger.debug('🔑 Login attempt for: ${_emailController.text.trim()}');
       await _authService.login(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
 
-      debugPrint('✅ Login successful');
+      AppLogger.debug('✅ Login successful');
 
       if (mounted) {
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
     } catch (error) {
-      debugPrint('Login failed: $error');
+      AppLogger.debug('Login failed: $error');
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -69,15 +73,15 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      debugPrint('🔑 Google Sign-In attempt');
+      AppLogger.debug('🔑 Google Sign-In attempt');
       await _authService.signInWithGoogle();
-      debugPrint('✅ Google Sign-In successful');
+      AppLogger.debug('✅ Google Sign-In successful');
 
       if (mounted) {
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
     } catch (error) {
-      debugPrint('❌ Google Sign-In failed: $error');
+      AppLogger.debug('❌ Google Sign-In failed: $error');
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -104,37 +108,20 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
-              const Text(
-                'Welcome Back',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.textDark,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Sign in to continue scheduling your games.',
-                style: TextStyle(color: AppTheme.textSecondary, fontSize: 14),
+              const SectionHeader(
+                title: 'Welcome Back',
+                subtitle: 'Sign in to continue scheduling your games.',
               ),
               const SizedBox(height: 32),
               Form(
                 key: _formKey,
                 child: Column(
                   children: [
-                    TextFormField(
+                    CustomTextField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        hintText: 'Email',
-                        filled: true,
-                        fillColor: Colors.white,
-                        prefixIcon: const Icon(Icons.mail_outline),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
+                      hintText: 'Email',
+                      icon: Icons.mail_outline,
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
                           return 'Email is required.';
@@ -146,19 +133,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
+                    CustomTextField(
                       controller: _passwordController,
                       obscureText: true,
-                      decoration: InputDecoration(
-                        hintText: 'Password',
-                        filled: true,
-                        fillColor: Colors.white,
-                        prefixIcon: const Icon(Icons.lock_outline),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
+                      hintText: 'Password',
+                      icon: Icons.lock_outline,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Password is required.';
@@ -170,24 +149,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                     ),
                     const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 52,
-                      child: ElevatedButton(
-                        onPressed: _isLoading ? null : _login,
-                        child: _isLoading
-                            ? const SizedBox(
-                                width: 22,
-                                height: 22,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.4,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.black,
-                                  ),
-                                ),
-                              )
-                            : const Text('Log In'),
-                      ),
+                    CustomButton(
+                      text: 'Log In',
+                      loading: _isLoading,
+                      onPressed: _login,
                     ),
                     const SizedBox(height: 16),
                     SizedBox(

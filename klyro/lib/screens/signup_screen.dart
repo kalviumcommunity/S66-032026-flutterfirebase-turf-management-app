@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/custom_button.dart';
+import '../widgets/custom_text_field.dart';
+import '../widgets/section_header.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -95,37 +98,20 @@ class _SignupScreenState extends State<SignupScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
-              const Text(
-                'Create Account',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.textDark,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Join Klyro to book and manage your sessions.',
-                style: TextStyle(color: AppTheme.textSecondary, fontSize: 14),
+              const SectionHeader(
+                title: 'Create Account',
+                subtitle: 'Join Klyro to book and manage your sessions.',
               ),
               const SizedBox(height: 32),
               Form(
                 key: _formKey,
                 child: Column(
                   children: [
-                    TextFormField(
+                    CustomTextField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        hintText: 'Email',
-                        filled: true,
-                        fillColor: Colors.white,
-                        prefixIcon: const Icon(Icons.mail_outline),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
+                      hintText: 'Email',
+                      icon: Icons.mail_outline,
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
                           return 'Email is required.';
@@ -137,19 +123,11 @@ class _SignupScreenState extends State<SignupScreen> {
                       },
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
+                    CustomTextField(
                       controller: _passwordController,
                       obscureText: true,
-                      decoration: InputDecoration(
-                        hintText: 'Password',
-                        filled: true,
-                        fillColor: Colors.white,
-                        prefixIcon: const Icon(Icons.lock_outline),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
+                      hintText: 'Password',
+                      icon: Icons.lock_outline,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Password is required.';
@@ -161,19 +139,11 @@ class _SignupScreenState extends State<SignupScreen> {
                       },
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
+                    CustomTextField(
                       controller: _confirmController,
                       obscureText: true,
-                      decoration: InputDecoration(
-                        hintText: 'Confirm Password',
-                        filled: true,
-                        fillColor: Colors.white,
-                        prefixIcon: const Icon(Icons.lock_outline),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
+                      hintText: 'Confirm Password',
+                      icon: Icons.lock_outline,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Confirm your password.';
@@ -185,24 +155,10 @@ class _SignupScreenState extends State<SignupScreen> {
                       },
                     ),
                     const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 52,
-                      child: ElevatedButton(
-                        onPressed: _isLoading ? null : _signUp,
-                        child: _isLoading
-                            ? const SizedBox(
-                                width: 22,
-                                height: 22,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.4,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.black,
-                                  ),
-                                ),
-                              )
-                            : const Text('Create Account'),
-                      ),
+                    CustomButton(
+                      text: 'Create Account',
+                      loading: _isLoading,
+                      onPressed: _signUp,
                     ),
                     const SizedBox(height: 16),
                     SizedBox(

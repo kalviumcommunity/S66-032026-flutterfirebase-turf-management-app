@@ -108,8 +108,11 @@ class _VenueListingScreenState extends State<VenueListingScreen> {
             children: [
               IconButton(
                 icon: const Icon(Icons.arrow_back, color: AppTheme.textDark),
-                onPressed:
-                    () {}, // Handled by standard back if pushed, but this is a nav screen
+                onPressed: () {
+                  if (Navigator.of(context).canPop()) {
+                    Navigator.of(context).pop();
+                  }
+                },
               ),
               const SizedBox(width: 8),
               const Text(
@@ -177,50 +180,56 @@ class _VenueListingScreenState extends State<VenueListingScreen> {
         itemCount: _categories.length,
         itemBuilder: (context, index) {
           final isSelected = index == _selectedCategoryIndex;
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                _selectedCategoryIndex = index;
-              });
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Column(
-                children: [
-                  Container(
-                    width: isTablet ? 68 : 60,
-                    height: isTablet ? 68 : 60,
-                    decoration: BoxDecoration(
-                      color: isSelected ? AppTheme.primaryGreen : Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                customBorder: const CircleBorder(),
+                onTap: () {
+                  setState(() {
+                    _selectedCategoryIndex = index;
+                  });
+                },
+                child: Column(
+                  children: [
+                    Container(
+                      width: isTablet ? 68 : 60,
+                      height: isTablet ? 68 : 60,
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? AppTheme.primaryGreen
+                            : Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        _categories[index]['icon'],
+                        color: isSelected ? Colors.black : AppTheme.textDark,
+                        size: isTablet ? 30 : 28,
+                      ),
                     ),
-                    child: Icon(
-                      _categories[index]['icon'],
-                      color: isSelected ? Colors.black : AppTheme.textDark,
-                      size: isTablet ? 30 : 28,
+                    const SizedBox(height: 8),
+                    Text(
+                      _categories[index]['name'],
+                      style: TextStyle(
+                        fontSize: isTablet ? 13 : 12,
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.w500,
+                        color: isSelected
+                            ? AppTheme.textDark
+                            : AppTheme.textSecondary,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _categories[index]['name'],
-                    style: TextStyle(
-                      fontSize: isTablet ? 13 : 12,
-                      fontWeight: isSelected
-                          ? FontWeight.bold
-                          : FontWeight.w500,
-                      color: isSelected
-                          ? AppTheme.textDark
-                          : AppTheme.textSecondary,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );
@@ -260,119 +269,134 @@ class _VenueListingScreenState extends State<VenueListingScreen> {
       itemCount: _venues.length,
       itemBuilder: (context, index) {
         final venue = _venues[index];
-        return GestureDetector(
-          onTap: () {
-            Navigator.pushNamed(
-              context,
-              AppRoutes.venueDetails,
-              arguments: venue,
-            );
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(20),
+        return Material(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                AppRoutes.venueDetails,
+                arguments: venue,
+              );
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
                   ),
-                  child: Image.network(
-                    venue['image'],
-                    height: imageHeight,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        height: imageHeight,
-                        color: AppTheme.backgroundLight,
-                        alignment: Alignment.center,
-                        child: const Icon(
-                          Icons.image_not_supported_outlined,
-                          color: AppTheme.textSecondary,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(screenWidth >= 700 ? 16 : 12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        venue['name'],
-                        style: TextStyle(
-                          fontSize: screenWidth >= 700 ? 16 : 14,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.textDark,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.location_on_outlined,
-                            size: 12,
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
+                    child: Image.network(
+                      venue['image'],
+                      height: imageHeight,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          height: imageHeight,
+                          color: AppTheme.backgroundLight,
+                          alignment: Alignment.center,
+                          child: const Icon(
+                            Icons.image_not_supported_outlined,
                             color: AppTheme.textSecondary,
                           ),
-                          const SizedBox(width: 4),
-                          Expanded(
-                            child: Text(
-                              venue['location'],
-                              style: TextStyle(
-                                fontSize: screenWidth >= 700 ? 11 : 10,
-                                color: AppTheme.textSecondary,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: List.generate(5, (starIndex) {
-                          return Icon(
-                            starIndex < venue['rating'].floor()
-                                ? Icons.star
-                                : Icons.star_half,
-                            size: 12,
-                            color: Colors.amber,
-                          );
-                        }),
-                      ),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 4,
-                        runSpacing: 4,
-                        children: [
-                          _buildMiniIcon(Icons.sports_cricket_outlined),
-                          _buildMiniIcon(Icons.sports_soccer_outlined),
-                          _buildMiniIcon(Icons.sports_tennis_outlined),
-                        ],
-                      ),
-                    ],
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
+                  Padding(
+                    padding: EdgeInsets.all(screenWidth >= 700 ? 16 : 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          venue['name'],
+                          style: TextStyle(
+                            fontSize: screenWidth >= 700 ? 16 : 14,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.textDark,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.location_on_outlined,
+                              size: 12,
+                              color: AppTheme.textSecondary,
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                venue['location'],
+                                style: TextStyle(
+                                  fontSize: screenWidth >= 700 ? 11 : 10,
+                                  color: AppTheme.textSecondary,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: _buildRatingIcons(
+                            venue['rating'] as double,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 4,
+                          runSpacing: 4,
+                          children: [
+                            _buildMiniIcon(Icons.sports_cricket_outlined),
+                            _buildMiniIcon(Icons.sports_soccer_outlined),
+                            _buildMiniIcon(Icons.sports_tennis_outlined),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );
       },
     );
+  }
+
+  List<Widget> _buildRatingIcons(double rating) {
+    return List.generate(5, (starIndex) {
+      final bool isFullStar = starIndex < rating.floor();
+      final bool isHalfStar =
+          !isFullStar && starIndex < rating && rating - rating.floor() >= 0.5;
+      return Icon(
+        isFullStar
+            ? Icons.star
+            : isHalfStar
+            ? Icons.star_half
+            : Icons.star_border,
+        size: 12,
+        color: Colors.amber,
+      );
+    });
   }
 
   Widget _buildMiniIcon(IconData icon) {
